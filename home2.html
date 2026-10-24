@@ -1,0 +1,1273 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Sven D. Manilhig - Interactive Portfolio Prototype</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            surface: '#0b1326',
+            'surface-dim': '#0b1326',
+            'surface-bright': '#31394d',
+            'surface-container-lowest': '#060e20',
+            'surface-container-low': '#131b2e',
+            'surface-container': '#172036',
+            'surface-container-high': '#222b42',
+            'surface-container-highest': '#2c364f',
+            primary: '#1d4ed8',
+            'primary-hover': '#2563eb',
+            'primary-container': '#1e3a8a',
+            'on-surface': '#f8fafc',
+            'on-surface-variant': '#94a3b8',
+            outline: '#334155',
+            'outline-variant': '#1e293b',
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #0b1326;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+    }
+    .page-view {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    .page-view.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .nav-btn.active {
+      background-color: #1d4ed8;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(29, 78, 216, 0.35);
+    }
+    .nav-btn:not(.active) {
+      color: #94a3b8;
+    }
+    .nav-btn:not(.active):hover {
+      background-color: #222b42;
+      color: #ffffff;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b1326;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #222b42;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-surface text-on-surface flex flex-col antialiased selection:bg-primary selection:text-white">
+<!-- Interactive Prototype Banner / Mode Badge -->
+<div class="bg-primary/20 border-b border-primary/30 px-4 py-2 text-xs text-center text-blue-200 flex items-center justify-center gap-2 sticky top-0 z-50 backdrop-blur-md">
+<span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="font-medium">Live Interactive Prototype:</span>
+<span>Click any nav link, button, or card below to seamlessly switch pages without page reloads.</span>
+<span class="ml-2 px-2 py-0.5 rounded bg-primary/40 text-[10px] uppercase font-mono tracking-wider font-semibold text-blue-100">Single-Page Architecture</span>
+</div>
+<!-- Persistent Top Header Navigation (Centered & Visible) -->
+<header class="sticky top-8 z-40 bg-surface/90 backdrop-blur-md border-b border-outline/30 px-6 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between">
+<!-- Left side: Portfolio Brand Pill / Indicator -->
+<div class="flex items-center gap-3">
+<a class="flex items-center gap-2 group" href="#home" onclick="navigateTo('home'); return false;">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline flex items-center justify-center text-primary group-hover:border-primary transition">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-semibold tracking-wider uppercase text-on-surface flex items-center gap-1.5">
+              Portfolio
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+</span>
+<span class="text-[10px] text-on-surface-variant font-mono">CEC • BSIT</span>
+</div>
+</a>
+</div>
+<!-- Center: Main Centered Navigation Pill -->
+<nav class="bg-surface-container-low border border-outline/50 rounded-full p-1.5 flex items-center gap-1 shadow-lg shadow-black/20" id="main-nav">
+<button class="nav-btn active px-5 py-2 rounded-full text-sm font-medium transition duration-200" id="nav-home" onclick="navigateTo('home')">
+          Home
+        </button>
+<button class="nav-btn px-5 py-2 rounded-full text-sm font-medium transition duration-200" id="nav-about" onclick="navigateTo('about')">
+          About
+        </button>
+<button class="nav-btn px-5 py-2 rounded-full text-sm font-medium transition duration-200" id="nav-skills" onclick="navigateTo('skills')">
+          Skills
+        </button>
+<button class="nav-btn px-5 py-2 rounded-full text-sm font-medium transition duration-200" id="nav-projects" onclick="navigateTo('projects')">
+          Projects
+        </button>
+<button class="nav-btn px-5 py-2 rounded-full text-sm font-medium transition duration-200" id="nav-contact" onclick="navigateTo('contact')">
+          Contact
+        </button>
+</nav>
+<!-- Right side: Quick Links & Actions -->
+<div class="flex items-center gap-3">
+<a class="p-2 rounded-lg bg-surface-container-high border border-outline/50 text-on-surface-variant hover:text-white hover:border-outline transition" href="https://github.com" rel="noopener noreferrer" target="_blank" title="GitHub Profile">
+<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+</a>
+<button class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-surface-container-high border border-outline text-xs font-medium text-on-surface hover:border-primary transition" onclick="navigateTo('contact')">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-400"></span>
+          Hire Me
+        </button>
+</div>
+</div>
+</header>
+<!-- MAIN DYNAMIC CONTENT CONTAINER -->
+<main class="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+<!-- ========================================== -->
+<!-- 1. HOME VIEW                              -->
+<!-- ========================================== -->
+<div class="page-view active space-y-16" id="view-home">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-4 pb-8">
+<div class="lg:col-span-7 space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline/50 text-xs text-blue-300">
+<svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
+<path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a10.97 10.97 0 00-.25 2.349c0 .647.054 1.282.158 1.899l-2.766.922a1 1 0 00-.672 1.259l1 3a1 1 0 001.26.672L6.8 17.2a10.957 10.957 0 003.2.477c1.118 0 2.199-.168 3.2-.477l2.822.941a1 1 0 001.26-.672l1-3a1 1 0 00-.672-1.259l-2.766-.922c.104-.617.158-1.252.158-1.899 0-.8-.09-1.583-.25-2.349l2.644-1.131a1 1 0 000-1.84l-7-3zM10 4.236l4.636 1.987L10 8.21 5.364 6.223 10 4.236z"></path>
+</svg>
+<span>BSIT Student • Cebu Eastern College Inc.</span>
+</div>
+<div class="space-y-3">
+<span class="text-xs font-mono font-semibold uppercase tracking-wider text-primary">IT Student &amp; Developer</span>
+<h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Hi, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-500 to-indigo-400">Sven D. Manilhig</span>.
+            </h1>
+<p class="text-xl sm:text-2xl font-medium text-slate-300">
+              Passionate about Software, Backend APIs, and IoT.
+            </p>
+</div>
+<p class="text-slate-400 text-base leading-relaxed max-w-2xl">
+            Actively seeking an <strong class="text-slate-200">IT Internship</strong> where I can apply my hands-on project experience, strong problem-solving skills, and foundation in software development and connected systems.
+          </p>
+<!-- CTAs -->
+<div class="flex flex-wrap items-center gap-4 pt-2">
+<button class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary hover:bg-primary-hover text-white font-medium text-sm transition shadow-lg shadow-primary/25 cursor-pointer" onclick="navigateTo('projects')">
+<span>View My Projects</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<a class="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-surface-container-high hover:bg-surface-bright border border-outline text-slate-200 font-medium text-sm transition cursor-pointer" href="#resume" onclick="alert('Resume download initiated (PDF placeholder).'); return false;">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Download Resume</span>
+</a>
+</div>
+<!-- Quick Stats Grid -->
+<div class="grid grid-cols-3 gap-4 pt-4 border-t border-outline/40 max-w-xl">
+<div>
+<div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Degree</div>
+<div class="text-base font-bold text-white mt-0.5">BSIT</div>
+<div class="text-xs text-slate-400">Information Tech</div>
+</div>
+<div>
+<div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Base</div>
+<div class="text-base font-bold text-white mt-0.5">Cebu City</div>
+<div class="text-xs text-slate-400">Philippines (UTC+8)</div>
+</div>
+<div>
+<div class="text-[11px] font-mono text-slate-400 uppercase tracking-wider">Status</div>
+<div class="text-base font-bold text-emerald-400 mt-0.5 flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Available
+              </div>
+<div class="text-xs text-slate-400">Full-time / Junior</div>
+</div>
+</div>
+</div>
+<!-- Terminal Profile Card with Replaceable Photo -->
+<div class="lg:col-span-5">
+<div class="bg-surface-container border border-outline/60 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+<div class="absolute -right-16 -top-16 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+<!-- Terminal Header -->
+<div class="flex items-center justify-between pb-4 border-b border-outline/50 mb-6">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-rose-500/80 inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+<span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+<span class="text-xs font-mono text-slate-400 ml-2">sven@cec-dev: ~/portfolio</span>
+</div>
+<span class="text-[11px] font-mono text-slate-400">v1.0.0</span>
+</div>
+<!-- Profile Info & Photo Placement -->
+<div class="flex items-center gap-5 mb-6">
+<!-- Replaceable Photo Placeholder Box -->
+<div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-dashed border-primary/50 bg-surface-container-high/60 flex flex-col items-center justify-center text-center p-2 relative group/photo hover:border-primary transition cursor-pointer" onclick="alert('Profile Photo Slot: Insert your own image here via &lt;img src=\'your-photo.jpg\'&gt;');">
+<svg class="w-8 h-8 text-slate-400 group-hover/photo:text-primary transition mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+<span class="text-[10px] font-medium text-slate-300">Replace Photo</span>
+<span class="text-[8px] text-slate-400 font-mono">Click to swap</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h3 class="text-lg font-bold text-white">Sven D. Manilhig</h3>
+<svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" fill-rule="evenodd"></path></svg>
+</div>
+<p class="text-xs text-slate-300 font-mono mt-0.5">BSIT Graduate • Cebu Eastern College</p>
+<div class="mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[11px] text-emerald-300 font-medium">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  Ready for Immediate Deployment
+                </div>
+</div>
+</div>
+<!-- Terminal Code Snippet Preview -->
+<div class="bg-surface-container-lowest rounded-xl p-4 font-mono text-xs text-slate-300 border border-outline/40 space-y-1.5">
+<p><span class="text-purple-400">const</span> developer = {</p>
+<p class="pl-4">name: <span class="text-emerald-300">'Sven D. Manilhig'</span>,</p>
+<p class="pl-4">almaMater: <span class="text-emerald-300">'Cebu Eastern College Inc.'</span>,</p>
+<p class="pl-4">focus: [<span class="text-amber-300">'Fullstack Web'</span>, <span class="text-amber-300">'REST APIs'</span>, <span class="text-amber-300">'IoT'</span>],</p>
+<p class="pl-4">openForHire: <span class="text-blue-400">true</span></p>
+<p>};</p>
+</div>
+<!-- Quick Action Links -->
+<div class="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-outline/40">
+<button class="py-2 px-3 rounded-lg bg-surface-container-high hover:bg-surface-bright text-xs text-slate-300 hover:text-white transition flex items-center justify-center gap-1.5 font-medium" onclick="navigateTo('about')">
+<span>View Full Bio</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<button class="py-2 px-3 rounded-lg bg-primary/20 hover:bg-primary/30 border border-primary/30 text-xs text-blue-300 hover:text-blue-200 transition flex items-center justify-center gap-1.5 font-medium" onclick="navigateTo('contact')">
+<span>Send Message</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Core Strengths & Foundations (Connected Cards) -->
+<section class="space-y-6">
+<div>
+<span class="text-xs font-mono font-semibold uppercase tracking-wider text-primary">Profile Overview</span>
+<h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Core Strengths &amp; Foundations</h2>
+<p class="text-slate-400 text-sm mt-1">A snapshot of my academic journey at Cebu Eastern College, technological toolkit, and hands-on capstone execution.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1 -> Links to About -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 hover:border-primary/60 transition cursor-pointer group flex flex-col justify-between" onclick="navigateTo('about')">
+<div class="space-y-4">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high border border-outline flex items-center justify-center text-primary group-hover:scale-110 transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Academic Milestone</span>
+<h3 class="text-lg font-bold text-white group-hover:text-primary transition mt-1">Recent Graduate</h3>
+<p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                  Graduated with a Bachelor of Science in Information Technology from <strong>Cebu Eastern College Inc.</strong> (Class of 2024).
+                </p>
+</div>
+<ul class="text-xs text-slate-300 space-y-1.5 pt-2 border-t border-outline/40">
+<li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Web Systems &amp; Technologies</li>
+<li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Relational Database (MySQL)</li>
+<li class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Systems Analysis &amp; Design</li>
+</ul>
+</div>
+<div class="pt-6 flex items-center justify-between text-xs font-medium text-primary">
+<span>View Academic Bio</span>
+<svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<!-- Card 2 -> Links to Skills -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 hover:border-primary/60 transition cursor-pointer group flex flex-col justify-between" onclick="navigateTo('skills')">
+<div class="space-y-4">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high border border-outline flex items-center justify-center text-primary group-hover:scale-110 transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Technical Competence</span>
+<h3 class="text-lg font-bold text-white group-hover:text-primary transition mt-1">Core Tech Stack</h3>
+<p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                  Hands-on practical development stack built throughout real academic projects and self-guided builds.
+                </p>
+</div>
+<div class="flex flex-wrap gap-1.5 pt-2">
+<span class="px-2 py-1 rounded bg-surface-container-high text-[11px] text-slate-300 border border-outline/40">• HTML5 / Semantic Web</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-[11px] text-slate-300 border border-outline/40">• CSS3 / Modern Flex &amp; Grid</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-[11px] text-slate-300 border border-outline/40">• JavaScript (ES6+)</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-[11px] text-slate-300 border border-outline/40">• Python &amp; Django</span>
+<span class="px-2 py-1 rounded bg-surface-container-high text-[11px] text-slate-300 border border-outline/40">• PHP &amp; Laravel APIs</span>
+</div>
+</div>
+<div class="pt-6 flex items-center justify-between text-xs font-medium text-primary">
+<span>Detailed Skillset</span>
+<svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<!-- Card 3 -> Links to Projects (Updated with IoT Leakage Capstone) -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 hover:border-primary/60 transition cursor-pointer group flex flex-col justify-between" onclick="navigateTo('projects')">
+<div class="space-y-4">
+<div class="w-10 h-10 rounded-xl bg-surface-container-high border border-outline flex items-center justify-center text-primary group-hover:scale-110 transition">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Featured Capstone (Ongoing)</span>
+<h3 class="text-lg font-bold text-white group-hover:text-primary transition mt-1">IoT-Based Water Leakage Monitoring</h3>
+<p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                  Real-time telemetry and pipeline differential monitoring system leveraging embedded IoT nodes to prevent resource loss.
+                </p>
+</div>
+<div class="p-3 rounded-lg bg-surface-container-lowest border border-outline/40 space-y-1">
+<div class="text-[11px] text-emerald-400 font-mono">ESP32 • Pipe Flow Differential Analysis</div>
+<div class="text-[11px] text-slate-400">IoT Sensors • C++ Microcontroller • REST APIs</div>
+</div>
+</div>
+<div class="pt-6 flex items-center justify-between text-xs font-medium text-primary">
+<span>Explore Projects</span>
+<svg class="w-4 h-4 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Interactive CTA Banner -->
+<section class="bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-high border border-outline/60 rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+<div class="space-y-2 text-center md:text-left">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary/20 text-blue-300 text-xs font-medium">
+<span class="w-2 h-2 rounded-full bg-blue-400"></span> Immediate Availability
+          </span>
+<h3 class="text-2xl font-bold text-white">Looking for an energetic, quick-learning junior developer?</h3>
+<p class="text-slate-400 text-sm max-w-xl">I'm currently seeking junior full-stack, front-end, back-end scripting, or technical support roles where I can make an immediate impact.</p>
+</div>
+<div class="flex items-center gap-3 shrink-0">
+<button class="px-5 py-2.5 rounded-lg bg-surface-container-high hover:bg-surface-bright border border-outline text-sm text-slate-200 font-medium transition cursor-pointer" onclick="navigateTo('projects')">
+            Explore All Projects
+          </button>
+<button class="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-hover text-sm text-white font-medium transition shadow-lg shadow-primary/25 cursor-pointer flex items-center gap-2" onclick="navigateTo('contact')">
+<span>Contact Sven</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</section>
+</div>
+<!-- ========================================== -->
+<!-- 2. ABOUT VIEW                             -->
+<!-- ========================================== -->
+<div class="page-view space-y-12" id="view-about">
+<!-- Section Header -->
+<div class="border-b border-outline/40 pb-6">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-xs font-mono text-primary border border-outline/50">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          About Me
+        </span>
+<h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">My Journey &amp; Background</h1>
+<p class="text-slate-400 text-sm sm:text-base mt-1">Get to know more about my education at Cebu Eastern College, academic projects, and passion for web development and connected systems.</p>
+</div>
+<!-- Bio Statement & Quick Facts Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<div class="lg:col-span-7 bg-surface-container border border-outline/50 rounded-2xl p-6 sm:p-8 space-y-5">
+<div class="text-xs font-mono text-primary uppercase font-semibold">Professional Statement</div>
+<h2 class="text-2xl font-bold text-white leading-snug">
+            Hello! I am Sven D. Manilhig, an enthusiastic IT graduate based in Cebu, Philippines.
+          </h2>
+<p class="text-slate-300 text-sm leading-relaxed">
+            Through intense coursework and real-world capstone challenges at <strong>Cebu Eastern College Inc.</strong>, I cultivated a structured approach toward software architecture, pragmatic full-stack development, and embedded IoT monitoring. I focus on developing clean, well-documented applications with dependable backend foundations and accessible, intuitive user interfaces.
+          </p>
+<p class="text-slate-300 text-sm leading-relaxed">
+            I view modern software engineering through a lens of continuous inquiry. When I encounter legacy constraints or complex bugs, I lean into systematic debugging and rigorous self-directed research to ship reliable digital solutions.
+          </p>
+<div class="pt-4 border-t border-outline/40">
+<span class="text-xs font-mono uppercase text-slate-400 block mb-3">Outside Core Development:</span>
+<div class="flex flex-wrap gap-2 text-xs">
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline/40 text-slate-300">🛠 PC Hardware Assembly</span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline/40 text-slate-300">🌐 IoT Prototyping</span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline/40 text-slate-300">♿ Web Accessibility Standards</span>
+<span class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline/40 text-slate-300">💻 Command-Line Scripting</span>
+</div>
+</div>
+</div>
+<!-- Quick Profile Facts Card -->
+<div class="lg:col-span-5 bg-surface-container border border-outline/50 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-6">
+<svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<h3 class="text-lg font-bold text-white">Quick Profile Facts</h3>
+</div>
+<div class="space-y-4 text-xs">
+<div class="flex justify-between py-2 border-b border-outline/30">
+<span class="text-slate-400">Institution</span>
+<span class="font-medium text-white text-right">Cebu Eastern College Inc.</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline/30">
+<span class="text-slate-400">Degree</span>
+<span class="font-medium text-white text-right">BS in Information Technology</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline/30">
+<span class="text-slate-400">Location</span>
+<span class="font-medium text-white text-right">Cebu, Central Visayas, PH</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline/30">
+<span class="text-slate-400">Languages</span>
+<span class="font-medium text-white text-right">English • Cebuano • Filipino</span>
+</div>
+<div class="flex justify-between py-2 border-b border-outline/30">
+<span class="text-slate-400">Availability</span>
+<span class="font-medium text-emerald-400 text-right">Immediate (Cebu / Remote)</span>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 rounded-xl bg-primary/10 border border-primary/20 text-xs text-blue-200">
+<span class="font-semibold block text-white mb-1">Career Goal:</span>
+            Eager to contribute as an entry-level software engineer, web developer, or technical support specialist in Cebu or remote engineering teams.
+          </div>
+</div>
+</div>
+<!-- Academic Milestones & Training Timeline -->
+<section class="space-y-6">
+<div>
+<span class="text-xs font-mono font-semibold uppercase tracking-wider text-primary">Curricular Road</span>
+<h2 class="text-2xl font-bold text-white mt-1">Academic Milestones &amp; Training</h2>
+<p class="text-slate-400 text-sm">Rigorous collegiate immersion covering software systems development, relational database architecture, and verified industry practicum.</p>
+</div>
+<div class="space-y-4">
+<!-- Timeline Item 1 -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 relative pl-8 border-l-4 border-l-primary">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="text-base sm:text-lg font-bold text-white">College Education: BS Information Technology</h3>
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-xs font-mono text-slate-300">2021 – 2025</span>
+</div>
+<div class="text-xs text-primary font-mono mb-2">Cebu Eastern College Inc.</div>
+<p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              Comprehensive degree program centered on applied computing, scalable design methodologies, and enterprise resource technologies. Maintained active focus across core modules:
+            </p>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-slate-400">
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Web Dev (HTML/CSS/JS/PHP)</div>
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Database Systems (MySQL)</div>
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Embedded Systems &amp; IoT</div>
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Systems Analysis &amp; Design</div>
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Python &amp; Framework Fundamentals</div>
+<div class="p-2 rounded bg-surface-container-high/60 border border-outline/30">• Information Security Basics</div>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 relative pl-8 border-l-4 border-l-blue-400">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="text-base sm:text-lg font-bold text-white">Capstone Project: IoT-Based Water Leakage Monitoring and Detection System</h3>
+<span class="px-2.5 py-1 rounded bg-blue-500/10 border border-blue-500/30 text-xs font-mono text-blue-300">Active Senior Thesis</span>
+</div>
+<div class="text-xs text-blue-400 font-mono mb-2">Lead Developer / Hardware &amp; IoT Architect</div>
+<p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Engineering an intelligent pipeline telemetry solution using ESP32 nodes and calibrated flow sensors. Implements differential flow comparison algorithms across pipeline nodes, dispatching instantaneous alert payloads over HTTP/REST endpoints.
+            </p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 relative pl-8 border-l-4 border-l-amber-400">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="text-base sm:text-lg font-bold text-white">On-The-Job Training (OJT): IT Support &amp; Junior Web Assistant</h3>
+<span class="px-2.5 py-1 rounded bg-amber-500/10 border border-amber-500/30 text-xs font-mono text-amber-300">480 Hours Completed</span>
+</div>
+<div class="text-xs text-amber-400 font-mono mb-2">Practicum Placement • Cebu City</div>
+<p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Supported hardware maintenance, local LAN configuration, workstation troubleshooting, and front-end content maintenance. Participated in real-world ticketing workflows, providing fast user resolutions and creating internal technical documentation.
+            </p>
+</div>
+</div>
+</section>
+<!-- Bottom Next Step CTA -->
+<div class="p-6 rounded-2xl bg-surface-container border border-outline/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div>
+<h4 class="text-lg font-bold text-white">Ready to evaluate my technical competencies?</h4>
+<p class="text-xs text-slate-400 mt-0.5">Review my complete technical stack, software proficiencies, and recent college projects.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-medium transition cursor-pointer" onclick="navigateTo('skills')">
+            Explore My Skills →
+          </button>
+<button class="px-4 py-2 rounded-lg bg-surface-container-high hover:bg-surface-bright border border-outline text-slate-200 text-xs font-medium transition cursor-pointer" onclick="navigateTo('contact')">
+            Let's Connect
+          </button>
+</div>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- 3. SKILLS VIEW                            -->
+<!-- ========================================== -->
+<div class="page-view space-y-12" id="view-skills">
+<!-- Section Header -->
+<div class="border-b border-outline/40 pb-6">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-xs font-mono text-primary border border-outline/50">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Technical &amp; Practical Skills
+        </span>
+<h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">Tools &amp; Technologies I Work With</h1>
+<p class="text-slate-400 text-sm sm:text-base mt-1">Foundations honed through academic coursework at Cebu Eastern College Inc., independent coding, and practical capstone development.</p>
+</div>
+<!-- Skills Grid (4 Tiers) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Tier 1: Frontend -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline/40">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-primary/20 text-primary flex items-center justify-center font-bold text-xs">01</div>
+<div>
+<h3 class="text-base font-bold text-white">Frontend Development</h3>
+<span class="text-[10px] font-mono text-slate-400">Coursework &amp; Practice</span>
+</div>
+</div>
+<span class="text-[11px] font-mono text-primary bg-primary/10 px-2 py-0.5 rounded">Core</span>
+</div>
+<div class="space-y-3 text-xs">
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>HTML5 / Semantic Web</span>
+<span class="text-emerald-400">Proficient</span>
+</div>
+<p class="text-slate-400 text-[11px]">Accessible element structure, standard form validations, metadata, and web accessibility fundamentals.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>CSS3 / Modern Layouts</span>
+<span class="text-emerald-400">Proficient</span>
+</div>
+<p class="text-slate-400 text-[11px]">Flexbox, CSS Grid, media query breakpoints, CSS variables, and subtle CSS transitions.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>JavaScript (ES6+)</span>
+<span class="text-blue-400">Intermediate</span>
+</div>
+<p class="text-slate-400 text-[11px]">DOM manipulation, event delegation, Fetch API async requests, Canvas animations, and local state management.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Tailwind CSS &amp; Bootstrap 5</span>
+<span class="text-blue-400">Practical</span>
+</div>
+<p class="text-slate-400 text-[11px]">Component-first layout structuring, responsive utility classes, and consistent design token application.</p>
+</div>
+</div>
+</div>
+<!-- Tier 2: Backend & Database -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline/40">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">02</div>
+<div>
+<h3 class="text-base font-bold text-white">Backend &amp; Database</h3>
+<span class="text-[10px] font-mono text-slate-400">APIs &amp; Systems</span>
+</div>
+</div>
+<span class="text-[11px] font-mono text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded">Primary</span>
+</div>
+<div class="space-y-3 text-xs">
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>PHP &amp; Laravel REST APIs</span>
+<span class="text-emerald-400">Proficient</span>
+</div>
+<p class="text-slate-400 text-[11px]">RESTful endpoints, task scheduling, middleware routing, and relational controllers.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Python &amp; Django</span>
+<span class="text-blue-400">Intermediate</span>
+</div>
+<p class="text-slate-400 text-[11px]">Django ORM, MTV architecture, automated migrations, user authentication, and attendance algorithms.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>MySQL &amp; Relational Databases</span>
+<span class="text-emerald-400">Proficient</span>
+</div>
+<p class="text-slate-400 text-[11px]">Relational schema design, normalization, foreign keys, multi-table JOIN queries, and database maintenance.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>IoT Firmware &amp; Hardware (C++/ESP32)</span>
+<span class="text-emerald-400">Applied</span>
+</div>
+<p class="text-slate-400 text-[11px]">Microcontroller programming, sensor telemetry, analog calibration, and HTTP client telemetry transmission.</p>
+</div>
+</div>
+</div>
+<!-- Tier 3: Developer Tools & Workflow -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline/40">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">03</div>
+<div>
+<h3 class="text-base font-bold text-white">Developer Tools &amp; Workflow</h3>
+<span class="text-[10px] font-mono text-slate-400">Daily Utility</span>
+</div>
+</div>
+<span class="text-[11px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded">Workflow</span>
+</div>
+<div class="space-y-3 text-xs">
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Git &amp; GitHub</span>
+<span class="text-emerald-400">Proficient</span>
+</div>
+<p class="text-slate-400 text-[11px]">Branching, commit etiquette, merging, resolving conflicts, and hosting project pages via GitHub Pages.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>VS Code</span>
+<span class="text-emerald-400">Daily IDE</span>
+</div>
+<p class="text-slate-400 text-[11px]">Productivity extensions, snippet authoring, integrated terminal, live server testing, and syntax linting.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Postman &amp; DevTools</span>
+<span class="text-blue-400">Practical</span>
+</div>
+<p class="text-slate-400 text-[11px]">Testing backend CRUD endpoints, inspecting header responses, verifying status codes, and mobile viewport emulation.</p>
+</div>
+</div>
+</div>
+<!-- Tier 4: IT & Computer Systems -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4">
+<div class="flex items-center justify-between pb-3 border-b border-outline/40">
+<div class="flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">04</div>
+<div>
+<h3 class="text-base font-bold text-white">IT &amp; Computer Systems</h3>
+<span class="text-[10px] font-mono text-slate-400">BSIT Labs</span>
+</div>
+</div>
+<span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">Hardware/LAN</span>
+</div>
+<div class="space-y-3 text-xs">
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Hardware Troubleshooting</span>
+<span class="text-emerald-400">Hands-on</span>
+</div>
+<p class="text-slate-400 text-[11px]">System unit assembly, component replacement (RAM, storage, PSU), POST code diagnosis, and thermal maintenance.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Local Area Networking (LAN)</span>
+<span class="text-blue-400">Practical</span>
+</div>
+<p class="text-slate-400 text-[11px]">RJ-45 UTP cable crimping (T568A/B), switch patching, IPv4 static addressing, subnetting, and gateway testing.</p>
+</div>
+<div class="p-3 rounded-xl bg-surface-container-low border border-outline/30 space-y-1">
+<div class="flex justify-between font-semibold text-white">
+<span>Windows &amp; Linux Desktops</span>
+<span class="text-blue-400">Competent</span>
+</div>
+<p class="text-slate-400 text-[11px]">OS installation, user permissions, disk partitioning, package managers (apt), and shell navigation.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Currently Exploring Section -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 sm:p-8 space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-xs font-mono uppercase text-primary font-semibold">Self-Directed Continuous Upskilling</span>
+<h3 class="text-xl font-bold text-white mt-1">Learning In Progress • Currently Exploring</h3>
+</div>
+<span class="w-2.5 h-2.5 rounded-full bg-blue-400 animate-ping hidden sm:block"></span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+<div class="p-4 rounded-xl bg-surface-container-low border border-outline/40">
+<div class="font-bold text-white text-sm">React.js Fundamentals</div>
+<div class="text-[11px] text-blue-400 font-mono mt-0.5">Component Architecture</div>
+<p class="text-xs text-slate-400 mt-2">JSX syntax, props, basic useState / useEffect hooks, and single-page rendering.</p>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-low border border-outline/40">
+<div class="font-bold text-white text-sm">TypeScript Basics</div>
+<div class="text-[11px] text-blue-400 font-mono mt-0.5">Type Safety &amp; Contracts</div>
+<p class="text-xs text-slate-400 mt-2">Static typing foundations, explicit type annotations, interface declarations for data models.</p>
+</div>
+<div class="p-4 rounded-xl bg-surface-container-low border border-outline/40">
+<div class="font-bold text-white text-sm">Modern CSS Frameworks</div>
+<div class="text-[11px] text-blue-400 font-mono mt-0.5">Design Systems</div>
+<p class="text-xs text-slate-400 mt-2">Deepening Tailwind configuration mastery, token pipelines, custom color themes, and headless UI.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- 4. PROJECTS VIEW                          -->
+<!-- ========================================== -->
+<div class="page-view space-y-12" id="view-projects">
+<!-- Section Header -->
+<div class="border-b border-outline/40 pb-6">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-xs font-mono text-primary border border-outline/50">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Academic &amp; Personal Projects
+        </span>
+<h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">Featured Work &amp; Capstones</h1>
+<p class="text-slate-400 text-sm sm:text-base mt-1">A portfolio of 6 practical solutions across embedded IoT systems, backend APIs, Python web apps, municipal systems, and interactive frontend builds.</p>
+</div>
+<!-- Project Filter Pills (Interactive - 5 Categories) -->
+<div class="flex flex-wrap items-center gap-2" id="project-filters">
+<button class="project-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-primary text-white transition cursor-pointer" onclick="filterProjects('all', this)">
+          All Projects (6)
+        </button>
+<button class="project-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-high text-slate-300 hover:text-white transition cursor-pointer" onclick="filterProjects('capstone', this)">
+          Academic Capstone
+        </button>
+<button class="project-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-high text-slate-300 hover:text-white transition cursor-pointer" onclick="filterProjects('webapp', this)">
+          Web Applications
+        </button>
+<button class="project-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-high text-slate-300 hover:text-white transition cursor-pointer" onclick="filterProjects('backend', this)">
+          Backend &amp; API
+        </button>
+<button class="project-filter-btn px-4 py-1.5 rounded-full text-xs font-medium bg-surface-container-high text-slate-300 hover:text-white transition cursor-pointer" onclick="filterProjects('iot', this)">
+          IoT &amp; Interactive
+        </button>
+</div>
+<!-- Projects Grid (6 Synced Projects) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8" id="projects-container">
+<!-- Project 1: IoT Water Leakage Monitoring (Capstone / IoT) -->
+<div class="project-item capstone iot bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 text-[10px] font-mono border border-blue-500/30">CAPSTONE PROJECT • ONGOING</span>
+<span class="text-[10px] font-mono text-emerald-400 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Active Hardware Prototyping
+                </span>
+</div>
+<div class="space-y-1">
+<div class="text-xs font-mono text-slate-300 flex items-center gap-2">
+<span class="text-blue-400">⚡ ESP32 Telemetry</span>
+<span>• Flow Rate Differential</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary w-5/6 h-full rounded-full"></div>
+</div>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">ESP32</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">IoT Sensors</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">C++</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">REST API</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">IoT-Based Water Leakage Monitoring and Detection System</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                An ongoing senior capstone system engineered to detect real-time fluid leakage across residential and institutional pipe networks using microcontroller telemetry.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-blue-400">✓</span> Differential pulse flow rate comparison between pipeline ingress and egress</div>
+<div class="flex items-center gap-2"><span class="text-blue-400">✓</span> ESP32 WiFi client streaming telemetry to REST API server backend</div>
+<div class="flex items-center gap-2"><span class="text-blue-400">✓</span> Automated threshold alarms preventing municipal water loss and structural damage</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-primary hover:text-blue-300 flex items-center gap-1.5 cursor-pointer" onclick="alert('Project Details: IoT-Based Water Leakage Monitoring and Detection System (Senior Capstone documentation).');">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Project Details</span>
+</button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub Repo</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+<!-- Project 2: Laravel Poll API (Backend) -->
+<div class="project-item backend bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-mono border border-indigo-500/30">BACKEND REST API • 2024</span>
+<span class="text-[10px] font-mono text-emerald-400">⚡ Scheduled Cron Queues</span>
+</div>
+<div class="text-center py-2">
+<span class="text-xs font-bold text-white">Dynamic Poll Architecture &amp; Voting Engine</span>
+<p class="text-[10px] text-slate-400">Laravel 10 • Eloquent ORM • Token Auth</p>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Laravel</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">PHP</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">REST API</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">MySQL</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">Laravel Poll API</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Full-featured RESTful poll orchestration service handling authenticated voting sessions, custom polling parameters, and background scheduling.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-indigo-400">✓</span> Automated scheduling logic with dynamic closing deadlines</div>
+<div class="flex items-center gap-2"><span class="text-indigo-400">✓</span> Dynamic choices payload with strict anti-duplicate IP/user enforcement</div>
+<div class="flex items-center gap-2"><span class="text-indigo-400">✓</span> Comprehensive JSON resource serialization and Postman collection</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-primary hover:text-blue-300 flex items-center gap-1.5 cursor-pointer" onclick="alert('API Endpoints documentation &amp; Postman spec initialized.');">
+<span>View API Spec</span>
+</button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+<!-- Project 3: Attendance & Score Monitoring System (WebApp / Python) -->
+<div class="project-item webapp bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono border border-emerald-500/30">PYTHON WEB APP • 2024</span>
+<span class="text-[10px] font-mono text-emerald-400">✓ Automated Computation</span>
+</div>
+<div class="text-center py-2">
+<span class="text-xs font-bold text-white">Student Academic Performance Engine</span>
+<p class="text-[10px] text-slate-400">Django ORM • PostgreSQL / SQLite • Statistical Charts</p>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Python</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Django</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">SQLite / Postgres</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">Attendance &amp; Score Monitoring System</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Full-cycle collegiate academic tracker designed to log daily classroom attendance rosters, compute standardized grade curves, and flag at-risk learners.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Django ORM relational queries for rapid student cohort lookups</div>
+<div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Instant attendance rosters with automated percentage scoring calculations</div>
+<div class="flex items-center gap-2"><span class="text-emerald-400">✓</span> Instructor score computation and one-click tabular grade exports</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-primary hover:text-blue-300 cursor-pointer" onclick="alert('Demo: Attendance and Score Monitoring preview sandbox opened.');">
+              System Overview
+            </button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+<!-- Project 4: Barangay Tool Reservation System (WebApp / PHP) -->
+<div class="project-item webapp backend bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono border border-amber-500/30">MUNICIPAL WEB SYSTEM • 2024</span>
+<span class="text-[10px] font-mono text-amber-300">📦 Asset Inventory Control</span>
+</div>
+<div class="text-center py-2">
+<span class="text-xs font-bold text-white">Barangay Equipment Lending &amp; Returns</span>
+<p class="text-[10px] text-slate-400">PHP 8 • MySQL • Citizen Borrowers DB</p>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">PHP / MySQL</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Inventory Mgt</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Local Gov</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">Barangay Tool Reservation System</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Localized community asset tracking portal enabling barangay personnel and residents to schedule, check out, and audit municipal equipment.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-amber-400">✓</span> Citizen reservation workflow with automated inventory stock validation</div>
+<div class="flex items-center gap-2"><span class="text-amber-400">✓</span> Due-date alert indicators tracking overdue borrow cycles</div>
+<div class="flex items-center gap-2"><span class="text-amber-400">✓</span> Granular audit trail for barangay property custodial accountability</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-primary hover:text-blue-300 cursor-pointer" onclick="alert('Project Details: Barangay Tool Reservation System specifications loaded.');">
+              System Walkthrough
+            </button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+<!-- Project 5: Educational Tutorial Website (Web Apps / Frontend) -->
+<div class="project-item webapp bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-teal-500/20 text-teal-300 text-[10px] font-mono border border-teal-500/30">LEARNING PLATFORM • 2024</span>
+<span class="text-[10px] font-mono text-teal-300">📚 Technical Documentation</span>
+</div>
+<div class="text-center py-2">
+<span class="text-xs font-bold text-white">Curated Programming How-Tos &amp; Guides</span>
+<p class="text-[10px] text-slate-400">Semantic UI • Code Snippet Highlights • Responsive Reader</p>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">HTML5 / CSS3</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">JavaScript</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">UI/UX</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Markdown/CMS</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">Educational Tutorial Website</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                A clean, distraction-free tutorial platform delivering beginner-friendly web technology guides, structured syntax examples, and interactive coding references.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-teal-400">✓</span> Modular markdown-driven course chapters with copy-paste code snippets</div>
+<div class="flex items-center gap-2"><span class="text-teal-400">✓</span> Client-side quick search and topic categorization filters</div>
+<div class="flex items-center gap-2"><span class="text-teal-400">✓</span> Responsive typography optimized for long-form screen reading comfort</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-primary hover:text-blue-300 cursor-pointer" onclick="alert('Educational Tutorial preview initialized.');">
+              Explore Content
+            </button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+<!-- Project 6: Web-Based Game (IoT & Interactive) -->
+<div class="project-item iot bg-surface-container border border-outline/50 rounded-2xl overflow-hidden hover:border-primary/60 transition group flex flex-col justify-between shadow-xl">
+<div class="p-6 space-y-4">
+<div class="h-44 rounded-xl bg-surface-container-lowest border border-outline/50 p-4 relative overflow-hidden flex flex-col justify-between">
+<div class="flex items-center justify-between">
+<span class="px-2.5 py-1 rounded bg-rose-500/20 text-rose-300 text-[10px] font-mono border border-rose-500/30">INTERACTIVE GAME • 2024</span>
+<span class="text-[10px] font-mono text-rose-300">🎮 60 FPS Canvas Engine</span>
+</div>
+<div class="text-center py-2">
+<span class="text-xs font-bold text-white">Browser Arcade Mini-Game</span>
+<p class="text-[10px] text-slate-400">HTML5 Canvas • requestAnimationFrame • Pure ES6</p>
+</div>
+<div class="flex flex-wrap gap-1.5">
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">Vanilla JS ES6+</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">HTML5 Canvas</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-surface-container-high text-slate-300 font-mono">CSS Animations</span>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-bold text-white group-hover:text-primary transition">Web-Based Game</h3>
+<p class="text-xs text-slate-300 mt-2 leading-relaxed">
+                Lightweight arcade browser game featuring smooth physics calculations, responsive keyboard and touch controls, and high-score retention.
+              </p>
+</div>
+<div class="space-y-1.5 text-xs text-slate-400">
+<div class="flex items-center gap-2"><span class="text-rose-400">✓</span> Built with zero third-party game libraries or bloated dependencies</div>
+<div class="flex items-center gap-2"><span class="text-rose-400">✓</span> requestAnimationFrame game loop for fluid 60 FPS sprite rendering</div>
+<div class="flex items-center gap-2"><span class="text-rose-400">✓</span> Precise AABB collision detection and persistent LocalStorage leaderboard</div>
+</div>
+</div>
+<div class="px-6 py-4 bg-surface-container-low border-t border-outline/40 flex items-center justify-between">
+<button class="text-xs font-medium text-rose-400 hover:text-rose-300 flex items-center gap-1.5 cursor-pointer" onclick="alert('Game launched: Running interactive Canvas loop simulation.');">
+<span>Play Game Demo</span>
+</button>
+<a class="text-xs font-medium text-slate-400 hover:text-white flex items-center gap-1.5" href="https://github.com" rel="noopener noreferrer" target="_blank">
+<span>GitHub</span>
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+</div>
+</div>
+<!-- Bottom Contact Trigger -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div>
+<span class="text-xs font-mono uppercase text-primary">Open For Opportunities</span>
+<h4 class="text-lg font-bold text-white mt-0.5">Have a project idea or looking to hire?</h4>
+<p class="text-xs text-slate-400">Let's discuss how my foundation can benefit your organization.</p>
+</div>
+<button class="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary-hover text-white text-xs font-medium transition cursor-pointer flex items-center gap-2 shrink-0" onclick="navigateTo('contact')">
+<span>Contact Sven</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- 5. CONTACT VIEW                           -->
+<!-- ========================================== -->
+<div class="page-view space-y-12" id="view-contact">
+<!-- Section Header -->
+<div class="border-b border-outline/40 pb-6">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-high text-xs font-mono text-primary border border-outline/50">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Get In Touch
+        </span>
+<h1 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">Let's Connect &amp; Work Together</h1>
+<p class="text-slate-400 text-sm sm:text-base mt-1">Whether you have an entry-level developer opportunity, an IT support opening, or want to discuss a project in Cebu or remote — my inbox is open!</p>
+</div>
+<!-- Main Form & Contact Info Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left: Status & Direct Info -->
+<div class="lg:col-span-5 space-y-6">
+<!-- Actively Seeking Card -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+<span class="text-xs font-semibold text-white">Actively Seeking Opportunities</span>
+</div>
+<span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">Immediate Start</span>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed">
+              Eager to contribute technical foundations, problem-solving discipline, and continuous learning to an agile engineering or operations squad.
+            </p>
+<div class="flex flex-wrap gap-1.5 pt-2 border-t border-outline/40">
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-[11px] text-slate-300">Junior Web Developer</span>
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-[11px] text-slate-300">Frontend Trainee</span>
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-[11px] text-slate-300">IT Support Specialist</span>
+<span class="px-2.5 py-1 rounded bg-surface-container-high text-[11px] text-slate-300">Backend / API Trainee</span>
+</div>
+</div>
+<!-- Contact Details -->
+<div class="bg-surface-container border border-outline/50 rounded-2xl p-6 space-y-4 text-xs">
+<div class="flex items-start gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline flex items-center justify-center text-primary shrink-0">@</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Direct Inquiries</span>
+<a class="block font-medium text-white hover:text-primary transition mt-0.5" href="mailto:sven.manilhig@example.com">sven.manilhig@example.com</a>
+</div>
+</div>
+<div class="flex items-start gap-3 pt-3 border-t border-outline/30">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline flex items-center justify-center text-primary shrink-0">📞</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Mobile / Viber</span>
+<div class="font-medium text-white mt-0.5">+63 9XX XXX XXXX <span class="text-[10px] text-slate-400 ml-1">(PH GMT+8)</span></div>
+</div>
+</div>
+<div class="flex items-start gap-3 pt-3 border-t border-outline/30">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline flex items-center justify-center text-primary shrink-0">📍</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Current Base &amp; Work Preference</span>
+<div class="font-medium text-white mt-0.5">Cebu City, Cebu, Philippines</div>
+<p class="text-[11px] text-slate-400 mt-0.5">Open to on-site roles across Cebu IT Park, Cebu Business Park, Mandaue, as well as distributed remote teams.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 pt-3 border-t border-outline/30">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high border border-outline flex items-center justify-center text-primary shrink-0">🎓</div>
+<div>
+<span class="text-[10px] font-mono uppercase text-slate-400">Credentials</span>
+<div class="font-medium text-white mt-0.5">Cebu Eastern College Inc.</div>
+<div class="text-[11px] text-slate-400">BS in Information Technology (Alumni)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Interactive Contact Form -->
+<div class="lg:col-span-7 bg-surface-container border border-outline/50 rounded-2xl p-6 sm:p-8 space-y-6">
+<div class="flex items-center justify-between border-b border-outline/40 pb-4">
+<div>
+<h3 class="text-xl font-bold text-white">Send Sven a Direct Message</h3>
+<p class="text-xs text-slate-400 mt-0.5">Fill in your parameters below to test the contact workflow.</p>
+</div>
+<span class="text-[11px] font-mono text-blue-300 bg-primary/20 px-2 py-1 rounded">Interactive Form</span>
+</div>
+<form class="space-y-4 text-xs" id="contact-form" onsubmit="handleContactSubmit(event)">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="font-medium text-slate-300">Full Name *</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low border border-outline text-white placeholder-slate-500 focus:outline-none focus:border-primary transition text-xs" id="form-name" placeholder="e.g. Maria Santos" required="" type="text">
+</div>
+<div class="space-y-1.5">
+<label class="font-medium text-slate-300">Email Address *</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low border border-outline text-white placeholder-slate-500 focus:outline-none focus:border-primary transition text-xs" id="form-email" placeholder="santos.m@company.com" required="" type="email">
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="space-y-1.5">
+<label class="font-medium text-slate-300">Company / Team (Optional)</label>
+<input class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low border border-outline text-white placeholder-slate-500 focus:outline-none focus:border-primary transition text-xs" id="form-company" placeholder="e.g. TechCorp Cebu" type="text">
+</div>
+<div class="space-y-1.5">
+<label class="font-medium text-slate-300">Subject Focus *</label>
+<select class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low border border-outline text-white focus:outline-none focus:border-primary transition text-xs" id="form-subject">
+<option value="Job Opportunity / Junior Role">Job Opportunity / Junior Role</option>
+<option value="IT Internship / Trainee Opening">IT Internship / Trainee Opening</option>
+<option value="Freelance Web Project">Freelance Web Project</option>
+<option value="General Technical Inquiry">General Technical Inquiry</option>
+</select>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-medium text-slate-300">Message / Opportunity Details *</label>
+<textarea class="w-full px-3.5 py-2.5 rounded-lg bg-surface-container-low border border-outline text-white placeholder-slate-500 focus:outline-none focus:border-primary transition text-xs" id="form-message" placeholder="Hi Sven, we came across your portfolio from Cebu Eastern College and have an opening for a Junior Web Developer in IT Park..." required="" rows="4"></textarea>
+</div>
+<button class="w-full py-3 rounded-lg bg-primary hover:bg-primary-hover text-white font-medium text-sm transition shadow-lg shadow-primary/25 cursor-pointer flex items-center justify-center gap-2" type="submit">
+<span>Send Message</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</button>
+<!-- Success Alert Placeholder -->
+<div class="hidden p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs text-center" id="form-success">
+              ✓ Message sent successfully! Sven will review your message shortly.
+            </div>
+<p class="text-[11px] text-slate-400 text-center pt-2">
+              ℹ Static-host friendly: Easily connect this form to Formspree, EmailJS, or standard mailto: handler for your GitHub Pages deployment.
+            </p>
+</form>
+</div>
+</div>
+<!-- FAQ Section -->
+<section class="space-y-6">
+<div>
+<span class="text-xs font-mono uppercase text-primary font-semibold">Candidate Primer</span>
+<h2 class="text-2xl font-bold text-white mt-1">Frequently Asked Questions</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+<div class="p-5 rounded-2xl bg-surface-container border border-outline/50 space-y-2">
+<h4 class="font-bold text-white text-sm">When can Sven start?</h4>
+<p class="text-slate-400 leading-relaxed">Immediately available upon offer acceptance. Academic coursework at Cebu Eastern College Inc. is complete, and all deployment-readiness requirements are fulfilled.</p>
+</div>
+<div class="p-5 rounded-2xl bg-surface-container border border-outline/50 space-y-2">
+<h4 class="font-bold text-white text-sm">Is Sven open to relocation or remote work?</h4>
+<p class="text-slate-400 leading-relaxed">Yes. Fully primed for on-site roles in Metro Cebu (Cebu IT Park, CBP, Mandaue City) as well as global or regional remote positions with standard fiber-optic and power backup setups.</p>
+</div>
+<div class="p-5 rounded-2xl bg-surface-container border border-outline/50 space-y-2">
+<h4 class="font-bold text-white text-sm">What core tech stack does Sven build with?</h4>
+<p class="text-slate-400 leading-relaxed">Primary foundations span HTML5/Tailwind CSS, JavaScript (ES6+), Python/Django, PHP/Laravel APIs, MySQL, and ESP32 microcontroller telemetry for IoT builds.</p>
+</div>
+<div class="p-5 rounded-2xl bg-surface-container border border-outline/50 space-y-2">
+<h4 class="font-bold text-white text-sm">Are code samples and academic projects public?</h4>
+<p class="text-slate-400 leading-relaxed">All major coursework, capstone repos, and live client prototypes are available directly on GitHub and within the Projects directory of this portfolio.</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Persistent Global Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline/40 py-10 px-6 mt-16 text-xs text-slate-400">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="space-y-1 text-center md:text-left">
+<div class="flex items-center justify-center md:justify-start gap-2">
+<span class="font-bold text-white text-sm">Sven D. Manilhig</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-high text-[10px] font-mono text-slate-300">CEC Alumnus</span>
+</div>
+<p class="text-[11px] text-slate-400">Bachelor of Science in Information Technology, Cebu Eastern College Inc.</p>
+<p class="text-[11px] text-slate-400">Pragmatic web development, clean system architecture, and scalable software solutions.</p>
+</div>
+<div class="flex flex-wrap items-center justify-center gap-6">
+<button class="hover:text-white transition" onclick="navigateTo('home')">Home</button>
+<button class="hover:text-white transition" onclick="navigateTo('about')">About</button>
+<button class="hover:text-white transition" onclick="navigateTo('skills')">Skills</button>
+<button class="hover:text-white transition" onclick="navigateTo('projects')">Projects</button>
+<button class="hover:text-white transition" onclick="navigateTo('contact')">Contact</button>
+</div>
+<div class="text-center md:text-right">
+<button class="px-4 py-2 rounded-lg bg-primary hover:bg-primary-hover text-white font-medium transition shadow" onclick="navigateTo('contact')">
+          Get in Touch
+        </button>
+</div>
+</div>
+<div class="max-w-7xl mx-auto text-center pt-8 mt-8 border-t border-outline/20 text-[11px] text-slate-400">
+      © 2025 Sven D. Manilhig. All rights reserved. • Interactive Multi-Page Prototype
+    </div>
+</footer>
+<!-- Single-Page Application Client-Side Navigation Script -->
+<script>
+    const pages = ['home', 'about', 'skills', 'projects', 'contact'];
+
+    function navigateTo(pageId) {
+      if (!pages.includes(pageId)) pageId = 'home';
+
+      // 1. Update views
+      pages.forEach(p => {
+        const viewEl = document.getElementById('view-' + p);
+        if (viewEl) {
+          if (p === pageId) {
+            viewEl.classList.add('active');
+          } else {
+            viewEl.classList.remove('active');
+          }
+        }
+      });
+
+      // 2. Update navigation pills active state
+      pages.forEach(p => {
+        const navBtn = document.getElementById('nav-' + p);
+        if (navBtn) {
+          if (p === pageId) {
+            navBtn.classList.add('active');
+          } else {
+            navBtn.classList.remove('active');
+          }
+        }
+      });
+
+      // 3. Update URL hash without reload
+      window.location.hash = pageId;
+
+      // 4. Smooth scroll back to top of viewport
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Hash change handler for browser back/forward buttons
+    window.addEventListener('hashchange', () => {
+      const hash = window.location.hash.replace('#', '') || 'home';
+      navigateTo(hash);
+    });
+
+    // Initial load check
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialHash = window.location.hash.replace('#', '');
+      if (initialHash && pages.includes(initialHash)) {
+        navigateTo(initialHash);
+      } else {
+        navigateTo('home');
+      }
+    });
+
+    // Project Filter logic supporting updated categories
+    function filterProjects(category, btnElement) {
+      const items = document.querySelectorAll('.project-item');
+      const buttons = document.querySelectorAll('.project-filter-btn');
+
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white');
+        btn.classList.add('bg-surface-container-high', 'text-slate-300');
+      });
+
+      if (btnElement) {
+        btnElement.classList.remove('bg-surface-container-high', 'text-slate-300');
+        btnElement.classList.add('bg-primary', 'text-white');
+      }
+
+      items.forEach(item => {
+        if (category === 'all' || item.classList.contains(category)) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+
+    // Contact Form submission handler
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      const successBox = document.getElementById('form-success');
+      if (successBox) {
+        successBox.classList.remove('hidden');
+        setTimeout(() => {
+          document.getElementById('contact-form').reset();
+        }, 1000);
+      }
+    }
+  </script>
+</body></html>
